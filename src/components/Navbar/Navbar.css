@@ -1,0 +1,9 @@
+
+.walletIcon, .addCarIcon {
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+}
+
+.walletIcon:hover, .addCarIcon:hover {
+    opacity: 0.6;
+}
