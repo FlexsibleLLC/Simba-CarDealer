@@ -30,7 +30,7 @@ export default function Home() {
 
     const onModalSave = async carPayload => {
         const car = await saveCar(carPayload);
-        setCars([...cars, car]);
+        setCars([car, ...cars]);
     };
 
     const onNewCarClick = () => {
