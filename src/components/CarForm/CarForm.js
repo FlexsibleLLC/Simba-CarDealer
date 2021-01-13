@@ -2,19 +2,54 @@ import React, { useState } from "react";
 import { Form, Button } from 'react-bootstrap';
 
 const Required = ({ text }) => {
-    return (
-        <span title={`${text} is required`}>
-            {text}<i className="text-danger">*</i>
-        </span>
-    );
+  return (
+    <span title={`${text} is required`}>
+        {text}<i className="text-danger">*</i>
+    </span>
+  );
 };
 
 export default function AddCarForm(props) {
-    const { onManufacturerChange, onModelChange, onVINChange, onDealerChange, onCarImageChange } = props;
-    const onSubmit = event => {
-        console.log("on submit event", event);
-        event.preventDefault();
+
+  const [manufacturer, setManufacturer] = useState('');
+  const [model, setModel] = useState('');
+  const [vin, setVin] = useState('');
+  const [dealer, setDealer] = useState('');
+  const [imageFile, setImageFile] = useState(null);
+
+  const onManufacturerChange = event => {
+      const manufacturer = event.target.value;
+      setManufacturer(manufacturer);
+  };
+  const onModelChange = event => {
+      const model = event.target.value;
+      setModel(model);
+  };
+  const onVINChange = event => {
+      const vin = event.target.value;
+      setVin(vin);
+  };
+  const onDealerChange = event => {
+      const dealer = event.target.value;
+      setDealer(dealer);
+  };
+  const onCarImageChange = event => {
+      const image = event.target.files[0];
+      setImageFile(image);
+  };
+
+  const onSubmit = event => {
+    const carPayload = {
+        manufacturer,
+        model,
+        vin,
+        dealer,
+        imageFile
     };
+    props.onSubmit(carPayload);
+    event.preventDefault();
+  };
+
   return (
     <Form onSubmit={onSubmit}>
       <Form.Group>
