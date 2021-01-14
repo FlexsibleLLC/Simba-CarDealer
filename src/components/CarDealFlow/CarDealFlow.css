@@ -1,0 +1,8 @@
+.hash {
+    font-size: 15px;
+    font-style: italic;
+}
+
+.modal-dialog {
+    max-width: 600px !important;
+}

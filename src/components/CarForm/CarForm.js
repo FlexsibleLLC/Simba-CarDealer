@@ -54,9 +54,9 @@ export default function AddCarForm(props) {
     <Form onSubmit={onSubmit}>
       <Form.Group>
         <Form.Label>
-            <Required text="Manufacturer" onChange={onManufacturerChange} />
+            <Required text="Manufacturer" />
         </Form.Label>
-        <Form.Control type="text" required />
+        <Form.Control type="text" required onChange={onManufacturerChange} />
       </Form.Group>
       <Form.Group>
         <Form.Label>

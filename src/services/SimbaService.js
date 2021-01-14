@@ -23,14 +23,20 @@ function simbaSetup() {
 
 const getSimbaInstance = simbaSetup();
 
-async function getCars() {
+async function getCarsTransactions() {
     const simba = await getSimbaInstance();
-    const transaction = await simba.getMethodTransactions('car', {});
-    const transactionFilePromises = transaction.data().map(record => simba.getFileFromBundleForTransaction(record.id, 0, false));
+    const simbaTransactionResponse = await simba.getMethodTransactions('car', {});
+    const transactionFilePromises = simbaTransactionResponse.data().map(record => simba.getFileFromBundleForTransaction(record.id, 0, false));
     const carImages = await Promise.all(transactionFilePromises);
     const carBlobImages = carImages.map(carImage => URL.createObjectURL(carImage));
-    const cars = transaction.data().map((record, index) => ({ ...record.payload.inputs, transactionId: record.id, imageUrl: carBlobImages[index] }));
-    return cars;
+
+    const carsTransactions = simbaTransactionResponse.data();
+
+    carsTransactions.map((transaction, index) => {
+        transaction.payload.inputs.imageUrl = carBlobImages[index];
+    });
+    
+    return carsTransactions;
 }
 
 async function saveCar(payload) {
@@ -64,13 +70,9 @@ async function saveCar(payload) {
         const carImage = await simba.getFileFromBundleForTransaction(transaction.id, 0, false);
         const imageBlob = URL.createObjectURL(carImage);
 
-        const car = {
-            ...transaction.payload.inputs,
-            transactionId: transaction.id,
-            imageUrl: imageBlob
-        };
+        transaction.payload.inputs.imageUrl = imageBlob;
 
-        return car;
+        return transaction;
 
     } catch(e) {
         console.log("Error saving car info: ", e);
@@ -78,9 +80,97 @@ async function saveCar(payload) {
     
 }
 
+async function saveReport(payload) {
+
+    const { time, __car, condition, inspector } = payload;
+
+    const postReportUrl = `${url}/report/`;
+
+    const requestPayload = { time, __car, condition, inspector, from };
+
+    try {
+        const response = await axios.post(postReportUrl, requestPayload);
+
+        const transaction = response.data;
+
+        return transaction;
+
+    } catch(e) {
+        console.log("Error saving report info: ", e);
+    }
+    
+}
+
+async function getReport(__car) {
+    const getReportUrl = `${url}/report/?${__car}`;
+
+    try {
+        const response = await axios.get(getReportUrl, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                APIKEY: apiKey
+            }
+        });
+
+        const transaction = response.data;
+
+        return transaction.results[0];
+
+    } catch(e) {
+        console.log("Error saving report info: ", e);
+    }
+    
+}
+
+async function saveSale(payload) {
+
+    const { time, __car, buyer, price } = payload;
+
+    const postSaleUrl = `${url}/sale/`;
+
+    const requestPayload = { time, __car, buyer, price, from };
+
+    try {
+        const response = await axios.post(postSaleUrl, requestPayload);
+
+        const transaction = response.data;
+
+        return transaction;
+
+    } catch(e) {
+        console.log("Error saving report info: ", e);
+    }
+    
+}
+
+async function getSale(__car) {
+    const getSaleUrl = `${url}/sale/?${__car}`;
+
+    try {
+        const response = await axios.get(getSaleUrl, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                APIKEY: apiKey
+            }
+        });
+
+        const transaction = response.data;
+
+        return transaction.results[0];
+
+    } catch(e) {
+        console.log("Error saving sale info: ", e);
+    }
+    
+}
+
 const SimbaService = {
-    getCars,
-    saveCar
+    getCarsTransactions,
+    saveCar,
+    saveReport,
+    getReport,
+    saveSale,
+    getSale
 };
 
 export default SimbaService;

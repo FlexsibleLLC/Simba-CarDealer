@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Modal from '../Modal';
 import CarForm from '../CarForm';
-
 export default function AddCarModalForm(props) {
     const { showModal, onClose } = props;
 

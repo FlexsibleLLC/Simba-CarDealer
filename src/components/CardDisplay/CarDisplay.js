@@ -6,12 +6,19 @@ import {
 } from "react-bootstrap";
 
 export default function CarDisplay(props) {
-  const { cars, onCardClick } = props;
+  const { carsTransactions, onCardClick } = props;
+  console.log("carsTransactions: ", carsTransactions)
+  const getCarCard = carTransaction => {
+    const carData = carTransaction.payload.inputs;
+    return (
+      <CarCard key={carData.__car} carTransaction={carTransaction} onClick={onCardClick} />
+    );
+  };
   return (
     <Container>
       <CardColumns>
         {
-          cars.map(car => <CarCard key={car.__car} car={car} onClick={onCardClick} />)
+          carsTransactions.map(getCarCard)
         }
       </CardColumns>
     </Container>

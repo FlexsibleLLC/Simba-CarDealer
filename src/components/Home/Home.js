@@ -5,23 +5,28 @@ import AddCarModalForm from '../Modal/AddCarModalForm';
 
 import SimbaService from '../../services/SimbaService';
 import Loader from '../Loader';
+import CarDealFlowModal from '../CarDealFlow/CarDealFlowModal';
 
-const { getCars, saveCar } = SimbaService;
+const { getCarsTransactions, saveCar } = SimbaService;
 
 export default function Home() {
 
     const [showModal, setShowModal] = useState(false);
-    const [cars, setCars] = useState([]);
+    const [showCarFlowModal, setShowCarFlowModal] = useState(false);
+    const [carFlowModalCar, setCarFlowModalCar] = useState(null);
+    const [carsTransactions, setCarsTransactions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(async () => {
-        const cars = await getCars();
+        const carsTransactions = await getCarsTransactions();
+        console.log("carsTransactions: ", carsTransactions)
         setIsLoading(false);
-        setCars(cars);
+        setCarsTransactions(carsTransactions);
     }, []);
 
-    const onCardClick = (car) => {
-        console.log("onCardClick", car);
+    const onCardClick = (carTransaction) => {
+        setCarFlowModalCar(carTransaction);
+        setShowCarFlowModal(true);
     };
 
     const onModalClose = () => {
@@ -29,34 +34,43 @@ export default function Home() {
     };
 
     const onModalSave = async carPayload => {
-        const car = await saveCar(carPayload);
-        setCars([car, ...cars]);
+        setIsLoading(true);
+        const carTransaction = await saveCar(carPayload);
+        setShowModal(false);
+        setCarsTransactions([carTransaction, ...carsTransactions]);
+        setIsLoading(false);
     };
 
     const onNewCarClick = () => {
         setShowModal(true);
     };
 
-    const getBody = () => {
-        if(isLoading) {
-            return (
-                <Loader />
-            );
-        }
-        return <CarDisplay cars={cars} onCardClick={onCardClick} />;
+    const onCarDealFlowModalClose = () => {
+        setShowCarFlowModal(false);
     };
 
     return (
         <div>
             <Navbar onNewCarClick={onNewCarClick}/>
             {
-                getBody()
+                isLoading && <Loader />
             }
+            <CarDisplay carsTransactions={carsTransactions} onCardClick={onCardClick} />
             <AddCarModalForm
                 showModal={showModal}
                 onClose={onModalClose}
                 onSave={onModalSave}
             />
+            {
+                carFlowModalCar && (
+                    <CarDealFlowModal
+                        carTransaction={carFlowModalCar}
+                        show={showCarFlowModal}
+                        onClose={onCarDealFlowModalClose}
+                    />
+                )
+            }
+            
         </div>
     );
 }
