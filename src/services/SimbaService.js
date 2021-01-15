@@ -75,7 +75,7 @@ async function saveCar(payload) {
         return transaction;
 
     } catch(e) {
-        console.log("Error saving car info: ", e);
+        console.error("Error saving car info: ", e);
     }
     
 }
@@ -89,21 +89,24 @@ async function saveReport(payload) {
     const requestPayload = { time, __car, condition, inspector, from };
 
     try {
-        const response = await axios.post(postReportUrl, requestPayload);
+        const response = await axios.post(postReportUrl, requestPayload, {
+            headers: {
+                APIKEY: apiKey
+            }
+        });
 
         const transaction = response.data;
 
         return transaction;
 
     } catch(e) {
-        console.log("Error saving report info: ", e);
+        console.error("Error saving report info: ", e);
     }
     
 }
 
 async function getReport(__car) {
-    const getReportUrl = `${url}/report/?${__car}`;
-
+    const getReportUrl = `${url}/report/?__car_exact=${__car}`;
     try {
         const response = await axios.get(getReportUrl, {
             headers: {
@@ -111,41 +114,33 @@ async function getReport(__car) {
                 APIKEY: apiKey
             }
         });
-
         const transaction = response.data;
-
         return transaction.results[0];
-
     } catch(e) {
-        console.log("Error saving report info: ", e);
+        console.error("Error saving report info: ", e);
     }
     
 }
 
 async function saveSale(payload) {
-
     const { time, __car, buyer, price } = payload;
-
     const postSaleUrl = `${url}/sale/`;
-
     const requestPayload = { time, __car, buyer, price, from };
-
     try {
-        const response = await axios.post(postSaleUrl, requestPayload);
-
+        const response = await axios.post(postSaleUrl, requestPayload, {
+            headers: {
+                APIKEY: apiKey
+            }
+        });
         const transaction = response.data;
-
         return transaction;
-
     } catch(e) {
-        console.log("Error saving report info: ", e);
+        console.error("Error saving report info: ", e);
     }
-    
 }
 
 async function getSale(__car) {
-    const getSaleUrl = `${url}/sale/?${__car}`;
-
+    const getSaleUrl = `${url}/sale/?__car_exact=${__car}`;
     try {
         const response = await axios.get(getSaleUrl, {
             headers: {
@@ -153,15 +148,11 @@ async function getSale(__car) {
                 APIKEY: apiKey
             }
         });
-
         const transaction = response.data;
-
         return transaction.results[0];
-
     } catch(e) {
-        console.log("Error saving sale info: ", e);
+        console.error("Error saving sale info: ", e);
     }
-    
 }
 
 const SimbaService = {

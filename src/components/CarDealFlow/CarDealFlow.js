@@ -2,37 +2,67 @@ import React, { useState, useEffect } from 'react';
 import './CarDealFlow.css';
 import { Button } from 'react-bootstrap';
 import SimbaService from '../../services/SimbaService';
+import AddReportForm from './AddReportForm';
+import AddSaleForm from './AddSaleForm';
 
-const { saveReport, getReport, getSale } = SimbaService;
+const { saveReport, getReport, getSale, saveSale } = SimbaService;
 
 export default function CarDealFlow(props) {
 
     const [reportTransaction, setReportTransaction] = useState(null);
     const [saleTransaction, setSaleTransaction] = useState(null);
     const [dataLoading, setDataLoading] = useState(true);
+    const [addingReport, setAddingReport] = useState(false);
+    const [addingSale, setAddingSale] = useState(false);
 
     const { carTransaction } = props;
     const { dealer, time, _bundleHash, __car } = carTransaction.payload.inputs;
     
-    useEffect(async () => {
-        try {
-            const reportTransaction = await getReport(__car);
-            if(reportTransaction) {
-                const saleTransaction = await getSale(__car);
-                setSaleTransaction(saleTransaction);
+    useEffect(() => {
+        const loadCarProgress = async () => {
+            try {
+                const reportTransaction = await getReport(__car);
+                setReportTransaction(reportTransaction);
+                if(reportTransaction) {
+                    const saleTransaction = await getSale(__car);
+                    setSaleTransaction(saleTransaction);
+                }
+            } catch(e) {
+            } finally {
+                setDataLoading(false);
             }
-            setReportTransaction(reportTransaction);
-        } catch(e) {
-            console.log("Error loading car deal history", e);
-        } finally {
-            setDataLoading(false);
-        }
+        };
+        loadCarProgress();
     }, []);
+
+    const onReportSubmit = async reportPayload => {
+        reportPayload.__car = __car;
+        reportPayload.time = Date.now();
+        const reportTransaction = await saveReport(reportPayload);
+        setReportTransaction(reportTransaction);
+        setAddingReport(false);
+    };
+
+    const onSaleSubmit = async salePayload => {
+        salePayload.__car = __car;
+        salePayload.time = Date.now();
+        const saleTransaction = await saveSale(salePayload);
+        setSaleTransaction(saleTransaction);
+        setAddingSale(false);
+    };
 
     const getReportComponent = () => {
 
-        if(!reportTransaction) {
+        if(addingReport) {
+            return <AddReportForm onSubmit={onReportSubmit} />
+        }
+
+        if(!reportTransaction && dataLoading) {
             return null;
+        }
+
+        if(!reportTransaction) {
+            return getAddReportButton();
         }
 
         const { inspector, time, condition } = reportTransaction.payload.inputs;
@@ -46,6 +76,7 @@ export default function CarDealFlow(props) {
                 <p>Inspected by {inspector} on {new Date(Number(time)).toDateString()}</p>
                 <p>Condition: {condition}</p>
                 <p>Transaction Hash: {transactionHash}</p>
+                
             </div>
         );
 
@@ -53,8 +84,16 @@ export default function CarDealFlow(props) {
 
     const getSaleComponent = () => {
 
-        if(!saleTransaction) {
+        if(addingSale) {
+            return <AddSaleForm onSubmit={onSaleSubmit} />
+        }
+
+        if(!saleTransaction && dataLoading) {
             return null;
+        }
+
+        if(!saleTransaction) {
+            return getAddSellButton();
         }
 
         const { buyer, price , time, } = saleTransaction.payload.inputs;
@@ -74,21 +113,54 @@ export default function CarDealFlow(props) {
     };
 
     const onAddReportClick = () => {
+        setAddingReport(true);
+    };
 
+    const onSaleClick = () => {
+        setAddingSale(true);
     };
 
     const getAddReportButton = () => {
         if(!reportTransaction) {
-            return <Button variant="primary" onClick={onAddReportClick}>ADD REPORT</Button>;
+            return (
+                <div className="d-flex justify-content-end">
+                    <Button variant="primary" onClick={onAddReportClick}>ADD REPORT</Button>
+                </div>
+            );
         }
         return null;
     };
 
     const getAddSellButton = () => {
         if(reportTransaction && !saleTransaction) {
-            return <Button variant="primary" onClick={onAddReportClick}>SALE</Button>;
+            return (
+                <div className="d-flex justify-content-end">
+                    <Button variant="primary" onClick={onSaleClick}>SALE</Button>
+                </div>
+            );
         }
         return null;
+    };
+
+    const getProgressMessage = () => {
+        if(dataLoading) {
+            return (
+                <div>
+                    <hr/>
+                    <span className="text-primary">Checking Data...</span>
+                </div>
+            );
+        }
+
+        if(reportTransaction && saleTransaction) {
+            return (
+                <div>
+                    <hr/>
+                    <p className="text-success">This transaction is complete, no further action can be taken</p>
+                </div>
+            );
+        }
+        
     };
 
     return (
@@ -99,34 +171,10 @@ export default function CarDealFlow(props) {
                 <p>Transaction Hash:</p>
                 <p className="hash">{carTransaction.transaction_hash}</p>
                 <p>IPFS Hash: <span className="hash">{_bundleHash}</span></p>
-
-                {
-
-                }
-                <div>
-                    {
-                        dataLoading ? <span className="text-primary">Checking Data...</span> : getAddReportButton()
-                    }
-                </div>
-                <div>
-                    {
-                        dataLoading ? <span className="text-primary">Checking Data...</span> : getAddSellButton()
-                    }
-                </div>
             </div>
-            
-            { reportTransaction && getReportComponent() }
-
-            { saleTransaction && getSaleComponent() }
-
-            {
-                reportTransaction && saleTransaction && (
-                    <p className="text-success">This transaction is complete, no further action can be taken</p>
-                )
-            }
-
+            { getReportComponent() }
+            { getSaleComponent() }
+            { getProgressMessage() }
         </div>
-        
-
     );
 }

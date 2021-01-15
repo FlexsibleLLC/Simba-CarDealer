@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
 import Modal from '../Modal';
 import CarDealFlow from './CarDealFlow';
 import './CarDealFlow.css';
 
 export default function CarDealFlowModal(props) {
     const { show, carTransaction } = props;
-    const carData = carTransaction.payload.inputs;
+    const { make, model, vin } = carTransaction.payload.inputs;
 
     const title = (
         <>
-            <h1>{carData.make} {carData.model}</h1>
-            <p>VIM: 123</p>
+            <h1>{make} {model}</h1>
+            <p>VIN: {vin}</p>
         </>
     );
     return (

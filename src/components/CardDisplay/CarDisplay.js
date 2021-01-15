@@ -7,7 +7,6 @@ import {
 
 export default function CarDisplay(props) {
   const { carsTransactions, onCardClick } = props;
-  console.log("carsTransactions: ", carsTransactions)
   const getCarCard = carTransaction => {
     const carData = carTransaction.payload.inputs;
     return (

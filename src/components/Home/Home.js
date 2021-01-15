@@ -18,10 +18,12 @@ export default function Home() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(async () => {
-        const carsTransactions = await getCarsTransactions();
-        console.log("carsTransactions: ", carsTransactions)
-        setIsLoading(false);
-        setCarsTransactions(carsTransactions);
+        const loadCarsTransactions = async () => {
+            const carsTransactions = await getCarsTransactions();
+            setIsLoading(false);
+            setCarsTransactions(carsTransactions);
+        };
+        loadCarsTransactions();
     }, []);
 
     const onCardClick = (carTransaction) => {
