@@ -17,7 +17,7 @@ export default function Home() {
     const [carsTransactions, setCarsTransactions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(async () => {
+    useEffect(() => {
         const loadCarsTransactions = async () => {
             const carsTransactions = await getCarsTransactions();
             setIsLoading(false);
@@ -53,7 +53,7 @@ export default function Home() {
 
     return (
         <div>
-            <Navbar onNewCarClick={onNewCarClick}/>
+            <Navbar onNewCarClick={onNewCarClick} />
             {
                 isLoading && <Loader />
             }
@@ -72,7 +72,7 @@ export default function Home() {
                     />
                 )
             }
-            
+
         </div>
     );
 }
