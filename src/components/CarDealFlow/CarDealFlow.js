@@ -17,23 +17,24 @@ export default function CarDealFlow(props) {
 
     const { carTransaction } = props;
     const { dealer, time, _bundleHash, __car } = carTransaction.payload.inputs;
-    
+
     useEffect(() => {
         const loadCarProgress = async () => {
             try {
                 const reportTransaction = await getReport(__car);
                 setReportTransaction(reportTransaction);
-                if(reportTransaction) {
+                if (reportTransaction) {
                     const saleTransaction = await getSale(__car);
                     setSaleTransaction(saleTransaction);
                 }
-            } catch(e) {
+            } catch (e) {
+                console.error("Error loading data.", e);
             } finally {
                 setDataLoading(false);
             }
         };
         loadCarProgress();
-    }, []);
+    }, [__car]);
 
     const onReportSubmit = async reportPayload => {
         reportPayload.__car = __car;
@@ -53,15 +54,15 @@ export default function CarDealFlow(props) {
 
     const getReportComponent = () => {
 
-        if(addingReport) {
+        if (addingReport) {
             return <AddReportForm onSubmit={onReportSubmit} />
         }
 
-        if(!reportTransaction && dataLoading) {
+        if (!reportTransaction && dataLoading) {
             return null;
         }
 
-        if(!reportTransaction) {
+        if (!reportTransaction) {
             return getAddReportButton();
         }
 
@@ -70,13 +71,13 @@ export default function CarDealFlow(props) {
 
         return (
             <div>
-                <hr/>
+                <hr />
                 <h2>Report</h2>
-                <br/>
+                <br />
                 <p>Inspected by {inspector} on {new Date(Number(time)).toDateString()}</p>
                 <p>Condition: {condition}</p>
                 <p>Transaction Hash: {transactionHash}</p>
-                
+
             </div>
         );
 
@@ -84,26 +85,26 @@ export default function CarDealFlow(props) {
 
     const getSaleComponent = () => {
 
-        if(addingSale) {
+        if (addingSale) {
             return <AddSaleForm onSubmit={onSaleSubmit} />
         }
 
-        if(!saleTransaction && dataLoading) {
+        if (!saleTransaction && dataLoading) {
             return null;
         }
 
-        if(!saleTransaction) {
+        if (!saleTransaction) {
             return getAddSellButton();
         }
 
-        const { buyer, price , time, } = saleTransaction.payload.inputs;
+        const { buyer, price, time, } = saleTransaction.payload.inputs;
         const { transaction_hash: transactionHash } = saleTransaction;
 
         return (
             <div>
-                <hr/>
+                <hr />
                 <h2>Sale</h2>
-                <br/>
+                <br />
                 <p>Sold to {buyer} on {new Date(Number(time)).toDateString()}</p>
                 <p>Price: {price}</p>
                 <p>Transaction Hash: {transactionHash}</p>
@@ -121,7 +122,7 @@ export default function CarDealFlow(props) {
     };
 
     const getAddReportButton = () => {
-        if(!reportTransaction) {
+        if (!reportTransaction) {
             return (
                 <div className="d-flex justify-content-end">
                     <Button variant="primary" onClick={onAddReportClick}>ADD REPORT</Button>
@@ -132,7 +133,7 @@ export default function CarDealFlow(props) {
     };
 
     const getAddSellButton = () => {
-        if(reportTransaction && !saleTransaction) {
+        if (reportTransaction && !saleTransaction) {
             return (
                 <div className="d-flex justify-content-end">
                     <Button variant="primary" onClick={onSaleClick}>SALE</Button>
@@ -143,38 +144,38 @@ export default function CarDealFlow(props) {
     };
 
     const getProgressMessage = () => {
-        if(dataLoading) {
+        if (dataLoading) {
             return (
                 <div>
-                    <hr/>
+                    <hr />
                     <span className="text-primary">Checking Data...</span>
                 </div>
             );
         }
 
-        if(reportTransaction && saleTransaction) {
+        if (reportTransaction && saleTransaction) {
             return (
                 <div>
-                    <hr/>
+                    <hr />
                     <p className="text-success">This transaction is complete, no further action can be taken</p>
                 </div>
             );
         }
-        
+
     };
 
     return (
         <div>
             <div>
                 <p>Registered by: {dealer} on {new Date(Number(time)).toDateString()}</p>
-                <br/>
+                <br />
                 <p>Transaction Hash:</p>
                 <p className="hash">{carTransaction.transaction_hash}</p>
                 <p>IPFS Hash: <span className="hash">{_bundleHash}</span></p>
             </div>
-            { getReportComponent() }
-            { getSaleComponent() }
-            { getProgressMessage() }
+            { getReportComponent()}
+            { getSaleComponent()}
+            { getProgressMessage()}
         </div>
     );
 }
