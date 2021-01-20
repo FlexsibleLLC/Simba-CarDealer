@@ -22,9 +22,11 @@ export default function CarDealFlowModal(props) {
             >
                 <CarDealFlow
                     carTransaction={carTransaction}
+                    displayToast={props.displayToast}
+                    showLoader={props.showLoader}
                 />
             </Modal>
         </div>
-        
+
     )
 }

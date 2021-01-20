@@ -37,19 +37,25 @@ export default function CarDealFlow(props) {
     }, [__car]);
 
     const onReportSubmit = async reportPayload => {
+        props.showLoader && props.showLoader(true);
         reportPayload.__car = __car;
         reportPayload.time = Date.now();
         const reportTransaction = await saveReport(reportPayload);
         setReportTransaction(reportTransaction);
         setAddingReport(false);
+        props.displayToast && props.displayToast('Saved Report successfully.');
+        props.showLoader && props.showLoader(false);
     };
 
     const onSaleSubmit = async salePayload => {
+        props.showLoader && props.showLoader(true);
         salePayload.__car = __car;
         salePayload.time = Date.now();
         const saleTransaction = await saveSale(salePayload);
         setSaleTransaction(saleTransaction);
         setAddingSale(false);
+        props.displayToast && props.displayToast('Saved Sale successfully.');
+        props.showLoader && props.showLoader(false);
     };
 
     const getReportComponent = () => {

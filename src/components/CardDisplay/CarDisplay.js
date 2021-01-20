@@ -2,9 +2,7 @@ import React from "react";
 import CarCard from "../CarCard/CarCard";
 import {
   Container,
-  CardColumns,
-  CardGroup,
-  CardDeck
+  CardColumns
 } from "react-bootstrap";
 
 export default function CarDisplay(props) {

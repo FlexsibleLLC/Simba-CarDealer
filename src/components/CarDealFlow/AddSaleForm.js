@@ -5,7 +5,7 @@ import RequiredLabel from '../CarForm/RequiredLabel';
 export default function AddSaleForm(props) {
 
     const [buyer, setBuyer] = useState('');
-    const [price, setPrice] = useState(null);
+    const [price, setPrice] = useState('');
 
     const onBuyerChange = event => {
         const buyer = event.target.value;

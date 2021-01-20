@@ -9,7 +9,7 @@ import CarDealFlowModal from '../CarDealFlow/CarDealFlowModal';
 
 const { getCarsTransactions, saveCar } = SimbaService;
 
-export default function Home() {
+export default function Home(props) {
 
     const [showModal, setShowModal] = useState(false);
     const [showCarFlowModal, setShowCarFlowModal] = useState(false);
@@ -41,6 +41,7 @@ export default function Home() {
         setShowModal(false);
         setCarsTransactions([carTransaction, ...carsTransactions]);
         setIsLoading(false);
+        props.displayToast('Saved car info successfully.');
     };
 
     const onNewCarClick = () => {
@@ -49,6 +50,7 @@ export default function Home() {
 
     const onCarDealFlowModalClose = () => {
         setShowCarFlowModal(false);
+        setIsLoading(false);
     };
 
     return (
@@ -69,6 +71,8 @@ export default function Home() {
                         carTransaction={carFlowModalCar}
                         show={showCarFlowModal}
                         onClose={onCarDealFlowModalClose}
+                        displayToast={props.displayToast}
+                        showLoader={show => setIsLoading(show)}
                     />
                 )
             }
